@@ -5,18 +5,584 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Репетитор ЕГЭ · Русский язык</title>
     
+    <!-- ============================================
+    ВНЕШНИЕ ЗАВИСИМОСТИ
+    ============================================ -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    
+    <!-- ============================================
+    ПОДКЛЮЧЕНИЕ СТИЛЕЙ
+    ============================================ -->
     <link rel="stylesheet" href="css/style.css">
+    
+    <!-- ============================================
+    ПОДКЛЮЧЕНИЕ ДАННЫХ И ЯДРА
+    ============================================ -->
+    <script src="data/initData.js"></script>
+    <script src="js/core/storage.js"></script>
+    <script src="js/core/auth.js"></script>
+    <script src="js/core/router.js"></script>
+    
+    <!-- ============================================
+    ПОДКЛЮЧЕНИЕ SHARED МОДУЛЕЙ
+    ============================================ -->
+    <script src="js/shared/renderUtils.js"></script>
+    <script src="js/shared/calendar.js"></script>
+    <script src="js/shared/modalManager.js"></script>
+    
+    <!-- ============================================
+    ПОДКЛЮЧЕНИЕ МОДУЛЕЙ АДМИНИСТРАТОРА
+    ============================================ -->
+    <script src="js/modules/admin/AdminDashboard.js"></script>
+    <script src="js/modules/admin/AdminLessons.js"></script>
+    <script src="js/modules/admin/AdminTasks.js"></script>
+    <script src="js/modules/admin/AdminReview.js"></script>
+    <script src="js/modules/admin/AdminStudents.js"></script>
+    <script src="js/modules/admin/AdminReports.js"></script>
+    <script src="js/modules/admin/AdminSettings.js"></script>
+    
+    <!-- ============================================
+    ПОДКЛЮЧЕНИЕ МОДУЛЕЙ УЧЕНИКА
+    ============================================ -->
+    <script src="js/modules/student/StudentDashboard.js"></script>
+    <script src="js/modules/student/StudentLessons.js"></script>
+    <script src="js/modules/student/StudentTasks.js"></script>
+    <script src="js/modules/student/StudentProgress.js"></script>
+    <script src="js/modules/student/StudentSettings.js"></script>
+    
+    <!-- ============================================
+    ПОДКЛЮЧЕНИЕ РАСШИРЕННЫХ МОДУЛЕЙ ЗАДАНИЙ
+    ============================================ -->
+    <script src="js/modules/admin/EnhancedMatching.js"></script>
 </head>
 <body>
-    <div id="app">
-        <div id="content-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-            <!-- Сюда будет загружаться приложение -->
+    <!-- ============================================
+    БЛОК АВТОРИЗАЦИИ
+    ============================================ -->
+    <div id="authBlock" class="auth-container">
+        <div class="auth-card">
+            <h2>Репетитор ЕГЭ</h2>
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">Вход</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">Регистрация</button>
+            </div>
+            
+            <div id="loginForm" class="auth-form">
+                <input type="email" id="loginEmail" placeholder="Email">
+                <input type="password" id="loginPassword" placeholder="Пароль">
+                <div class="auth-error" id="loginError"></div>
+                <button class="auth-btn" onclick="handleLogin()">Войти</button>
+            </div>
+            
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <input type="text" id="registerName" placeholder="Ваше имя">
+                <input type="email" id="registerEmail" placeholder="Email">
+                <input type="password" id="registerPassword" placeholder="Пароль">
+                <input type="password" id="registerConfirm" placeholder="Подтвердите пароль">
+                <div class="auth-error" id="registerError"></div>
+                <button class="auth-btn" onclick="handleRegister()">Зарегистрироваться</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    БЛОК ОСНОВНОГО ПРИЛОЖЕНИЯ
+    ============================================ -->
+    <div id="appBlock" class="app-container">
+        <div class="app-wrapper">
+            <!-- Сайдбар -->
+            <aside class="sidebar">
+                <div class="logo-area">
+                    <div class="logo-icon"><i class="fas fa-pen-fancy"></i></div>
+                    <div>
+                        <div class="logo-text">Репетитор ЕГЭ</div>
+                        <div class="logo-small">русский язык</div>
+                    </div>
+                </div>
+
+                <nav class="nav-menu" id="mainNav"></nav>
+
+                <div class="user-chip" onclick="logout()">
+                    <div class="user-avatar" id="userInitials"></div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName"></div>
+                        <div class="user-role-badge" id="userRole"></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Контент -->
+            <main class="main-content">
+                <div class="top-bar">
+                    <h1 class="page-title" id="pageTitle">Главная</h1>
+                    <div class="role-indicator" id="roleIndicator"></div>
+                </div>
+                <div id="sectionContainer"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ============================================
+    МОДАЛЬНЫЕ ОКНА
+    ============================================ -->
+    
+    <!-- Модальное окно: Создание задания "Выбрать варианты ответа" -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <div class="modal-header">
+                <h3 id="taskModalTitle">Создать задание</h3>
+                <span class="close-modal" onclick="closeTaskModal()">&times;</span>
+            </div>
+            
+            <div class="form-group">
+                <label>Тема задания</label>
+                <select id="taskTheme">
+                    <option value="orthography">📝 Орфография</option>
+                    <option value="punctuation">🔖 Пунктуация</option>
+                    <option value="text">📄 Работа с текстом</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Название задания</label>
+                <input type="text" id="taskName" placeholder="Например: Правописание Н и НН">
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 24px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; font-weight: 500;">
+                    <input type="radio" name="checkMode" value="auto" checked> 
+                    <i class="fas fa-robot" style="color: #334155; font-size: 18px;"></i> Автоматическая проверка
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; font-weight: 500;">
+                    <input type="radio" name="checkMode" value="manual"> 
+                    <i class="fas fa-user-check" style="color: #334155; font-size: 18px;"></i> Ручная проверка
+                </label>
+            </div>
+
+            <div class="availability-section">
+                <h4>🔐 Доступность задания</h4>
+                <div class="availability-option" onclick="selectAvailability('all')">
+                    <input type="radio" name="availability" value="all" checked>
+                    <div><strong>Доступно всем</strong></div>
+                </div>
+                <div class="availability-option" onclick="selectAvailability('selective')">
+                    <input type="radio" name="availability" value="selective">
+                    <div><strong>Выборочный доступ</strong></div>
+                </div>
+                <div id="studentSelector" class="student-selector" style="display: none;">
+                    <div id="studentList"></div>
+                </div>
+            </div>
+
+            <div class="subtasks-section">
+                <div class="subtasks-header">
+                    <h4>📋 Подзадания</h4>
+                    <button class="btn-primary btn-small" onclick="addSubtask()">
+                        <i class="fas fa-plus"></i> Добавить подзадание
+                    </button>
+                </div>
+                <div id="subtasksContainer"></div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="btn-outline" onclick="closeTaskModal()">Отмена</button>
+                <button class="btn-primary" onclick="saveTask()">
+                    <i class="fas fa-save"></i> Сохранить задание
+                </button>
+            </div>
         </div>
     </div>
     
-    <!-- Подключаем модули -->
-    <script type="module" src="js/app.js"></script>
+    <!-- Модальное окно: Выбор подтипа задания -->
+    <div id="matchingSubtypeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Выберите подтип задания</h3>
+                <span class="close-modal" onclick="closeMatchingSubtypeModal()">&times;</span>
+            </div>
+            
+            <div class="subtype-selector">
+                <div class="subtype-option" onclick="selectMatchingSubtype('pairs')">
+                    <i class="fas fa-link"></i>
+                    <h4>Установить соответствие</h4>
+                    <p>Классическое задание на соответствие между двумя списками</p>
+                </div>
+                
+                <div class="subtype-option" onclick="selectMatchingSubtype('distribution')">
+                    <i class="fas fa-arrows-alt"></i>
+                    <h4>Распределение по столбцам</h4>
+                    <p>Распределение слов по столбцам в зависимости от правил</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Создание задания на соответствие (pairs) -->
+    <div id="matchingTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="matchingModalTitle">Создать задание на соответствие</h3>
+                <span class="close-modal" onclick="closeMatchingTaskModal()">&times;</span>
+            </div>
+            
+            <div class="form-group">
+                <label>Тема задания</label>
+                <select id="matchingTheme">
+                    <option value="grammar">📚 Грамматические ошибки (задание 8)</option>
+                    <option value="syntax">🔤 Синтаксические нормы</option>
+                    <option value="orthography">📝 Орфография</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Название задания</label>
+                <input type="text" id="matchingName" placeholder="Например: Грамматические ошибки в предложениях">
+            </div>
+
+            <div class="form-group">
+                <label>Описание задания</label>
+                <textarea id="matchingDescription" rows="2" placeholder="Установите соответствие между грамматическими ошибками и предложениями..."></textarea>
+            </div>
+
+            <div class="columns-config">
+                <div class="column-config">
+                    <h4>Левый столбец</h4>
+                    <div class="column-header-input">
+                        <input type="text" id="leftColumnName" placeholder="Название столбца" value="ОШИБКИ">
+                    </div>
+                    <div class="column-items" id="leftColumnItems"></div>
+                    <button class="add-item-btn" onclick="addLeftItem()">
+                        <i class="fas fa-plus"></i> Добавить пункт
+                    </button>
+                </div>
+
+                <div class="column-config">
+                    <h4>Правый столбец</h4>
+                    <div class="column-header-input">
+                        <input type="text" id="rightColumnName" placeholder="Название столбца" value="ПРЕДЛОЖЕНИЯ">
+                    </div>
+                    <div class="column-items" id="rightColumnItems"></div>
+                    <button class="add-item-btn" onclick="addRightItem()">
+                        <i class="fas fa-plus"></i> Добавить пункт
+                    </button>
+                </div>
+            </div>
+
+            <div class="correct-answers-section">
+                <h4>Правильные ответы</h4>
+                <p style="color: #64748b; font-size: 14px; margin-bottom: 16px;">
+                    Для каждого пункта из левого столбца укажите соответствующий пункт из правого
+                </p>
+                <div id="correctAnswers"></div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="btn-outline" onclick="closeMatchingTaskModal()">Отмена</button>
+                <button class="btn-primary" onclick="saveMatchingTask()">
+                    <i class="fas fa-save"></i> Сохранить задание
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Создание задания на распределение -->
+    <div id="distributionTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="distributionModalTitle">Создать задание на распределение</h3>
+                <span class="close-modal" onclick="closeDistributionTaskModal()">&times;</span>
+            </div>
+            
+            <div class="form-group">
+                <label>Тема задания</label>
+                <select id="distributionTheme">
+                    <option value="orthography">📝 Правописание Н и НН</option>
+                    <option value="orthography2">📝 Буквы И/Ы после приставок</option>
+                    <option value="orthography3">📝 Чередующиеся гласные</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Название задания</label>
+                <input type="text" id="distributionName" placeholder="Например: Н и НН в прилагательных">
+            </div>
+
+            <div class="form-group">
+                <label>Описание задания</label>
+                <textarea id="distributionDescription" rows="2" placeholder="Распределите слова по столбцам в зависимости от написания..."></textarea>
+            </div>
+
+            <div class="distribution-config">
+                <div class="columns-list">
+                    <h4>Столбцы</h4>
+                    <div id="distributionColumns"></div>
+                    <button class="add-item-btn" onclick="addColumn()">
+                        <i class="fas fa-plus"></i> Добавить столбец
+                    </button>
+                </div>
+
+                <div class="words-list">
+                    <h4>Слова для распределения</h4>
+                    <div id="distributionWords"></div>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <input type="text" id="newWordInput" placeholder="Введите слово" style="flex: 1; padding: 8px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                        <button class="btn-primary btn-small" onclick="addWord()">
+                            <i class="fas fa-plus"></i> Добавить
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="distribution-answers">
+                <h4>Правильные ответы</h4>
+                <p style="color: #64748b; font-size: 14px; margin-bottom: 16px;">
+                    Для каждого слова укажите столбец, в который оно должно попасть
+                </p>
+                <div id="distributionCorrectAnswers"></div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="btn-outline" onclick="closeDistributionTaskModal()">Отмена</button>
+                <button class="btn-primary" onclick="saveDistributionTask()">
+                    <i class="fas fa-save"></i> Сохранить задание
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Создание задания "Написать слово" -->
+    <div id="writeWordModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 id="writeWordModalTitle">Создать задание: написать слово</h3>
+                <span class="close-modal" onclick="closeWriteWordModal()">&times;</span>
+            </div>
+
+            <div class="form-group">
+                <label>Тема задания</label>
+                <select id="writeWordTheme">
+                    <option value="orthography">📝 Орфография</option>
+                    <option value="punctuation">🔖 Пунктуация</option>
+                    <option value="grammar">📚 Грамматика</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Название задания</label>
+                <input type="text" id="writeWordName" placeholder="Например: Паронимы в задании 5">
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 24px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; font-weight: 500;">
+                    <input type="radio" name="writeWordCheckMode" value="auto" checked> 
+                    <i class="fas fa-robot" style="color: #334155; font-size: 18px;"></i> Автоматическая
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; font-weight: 500;">
+                    <input type="radio" name="writeWordCheckMode" value="manual"> 
+                    <i class="fas fa-user-check" style="color: #334155; font-size: 18px;"></i> Ручная
+                </label>
+            </div>
+
+            <div class="availability-section">
+                <h4>🔐 Доступность задания</h4>
+                <div class="availability-option" onclick="selectWriteWordAvailability('all')">
+                    <input type="radio" name="writeWordAvailability" value="all" checked> 
+                    <div>
+                        <strong>Всем ученикам</strong>
+                        <p style="font-size: 13px; color: #64748b;">Задание появится у всех учеников</p>
+                    </div>
+                </div>
+                <div class="availability-option" onclick="selectWriteWordAvailability('selective')">
+                    <input type="radio" name="writeWordAvailability" value="selective"> 
+                    <div>
+                        <strong>Выборочно</strong>
+                        <p style="font-size: 13px; color: #64748b;">Выберите конкретных учеников</p>
+                    </div>
+                </div>
+                <div id="writeWordStudentSelector" class="student-selector" style="display: none;"></div>
+            </div>
+
+            <div class="checkbox-with-text">
+                <input type="checkbox" id="writeWordIncludeText" onchange="toggleWriteWordTextArea(this.checked)">
+                <label for="writeWordIncludeText"><strong>Добавить текст в задание</strong> (отобразится ученику)</label>
+            </div>
+
+            <div id="writeWordTextGroup" class="form-group" style="display: none;">
+                <label>Текст для работы с заданием</label>
+                <textarea id="writeWordText" rows="4" placeholder="Введите текст, который увидит ученик..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Описание задания (будет показано ученику)</label>
+                <textarea id="writeWordDescription" rows="2" placeholder="Например: Исправьте лексическую ошибку, запишите подобранное слово..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Правильные ответы (можно указать несколько вариантов)</label>
+                <div id="writeWordCorrectAnswersContainer" class="multiple-answers-container">
+                    <!-- Поля добавляются динамически -->
+                </div>
+                <button class="btn-add-answer" type="button" onclick="addWriteWordAnswerField()">
+                    <i class="fas fa-plus"></i> Добавить верный вариант
+                </button>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="btn-outline" onclick="closeWriteWordModal()">Отмена</button>
+                <button class="btn-primary" onclick="saveWriteWordTask()">
+                    <i class="fas fa-save"></i> Сохранить задание
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Создание задания "Работа с текстом" -->
+    <div id="textWorkModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h3 id="textWorkModalTitle">Создать задание: работа с текстом</h3>
+                <span class="close-modal" onclick="closeTextWorkModal()">&times;</span>
+            </div>
+
+            <div class="form-group">
+                <label>Тип задания</label>
+                <select id="textWorkType" onchange="toggleTextWorkType()">
+                    <option value="text-work">📄 Работа с текстом</option>
+                    <option value="essay">📝 Сочинение</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Тема задания</label>
+                <select id="textWorkTheme">
+                    <option value="text">📄 Работа с текстом</option>
+                    <option value="grammar">📚 Грамматика</option>
+                    <option value="syntax">🔤 Синтаксис</option>
+                    <option value="punctuation">🔖 Пунктуация</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Название задания</label>
+                <input type="text" id="textWorkName" placeholder="Например: Синтаксический анализ текста">
+            </div>
+
+            <div class="form-group">
+                <label>Описание задания</label>
+                <textarea id="textWorkDescription" rows="2" placeholder="Опишите, что нужно сделать ученику..."></textarea>
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 24px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; font-weight: 500;">
+                    <input type="radio" name="textWorkCheckMode" value="auto" checked onchange="toggleTextWorkCheckMode()"> 
+                    <i class="fas fa-robot" style="color: #334155; font-size: 18px;"></i> Автоматическая проверка
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 15px; font-weight: 500;">
+                    <input type="radio" name="textWorkCheckMode" value="manual" onchange="toggleTextWorkCheckMode()"> 
+                    <i class="fas fa-user-check" style="color: #334155; font-size: 18px;"></i> Ручная проверка
+                </label>
+            </div>
+
+            <div class="availability-section">
+                <h4>🔐 Доступность задания</h4>
+                <div class="availability-option" onclick="selectTextWorkAvailability('all')">
+                    <input type="radio" name="textWorkAvailability" value="all" checked> 
+                    <div>
+                        <strong>Всем ученикам</strong>
+                        <p style="font-size: 13px; color: #64748b;">Задание появится у всех учеников</p>
+                    </div>
+                </div>
+                <div class="availability-option" onclick="selectTextWorkAvailability('selective')">
+                    <input type="radio" name="textWorkAvailability" value="selective"> 
+                    <div>
+                        <strong>Выборочно</strong>
+                        <p style="font-size: 13px; color: #64748b;">Выберите конкретных учеников</p>
+                    </div>
+                </div>
+                <div id="textWorkStudentSelector" class="student-selector" style="display: none;"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Работа с текстом (исходный)</label>
+                <textarea id="textWorkSource" class="text-work-field" rows="8" placeholder="Введите исходный текст, который увидит ученик..."></textarea>
+                <div class="form-hint">Ученик будет редактировать этот текст. Исходный текст не изменится.</div>
+            </div>
+
+            <!-- Поля для типа "Работа с текстом" (скрываются для "Сочинение") -->
+            <div id="textWorkAutoCheckSection">
+                <div class="form-group">
+                    <label>Верный текст (для автоматической проверки)</label>
+                    <textarea id="textWorkCorrect" class="text-work-field" rows="8" placeholder="Введите текст с правильными ответами. Система сравнит ответ ученика с этим текстом..."></textarea>
+                    <div class="correct-text-hint">💡 Система сравнивает каждое отличие и подсвечивает ошибки. Используйте символ [...] для обозначения мест, где ученик должен вставить свой ответ.</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Количество заполняемых пропусков</label>
+                    <input type="number" id="textWorkGapCount" value="5" min="1" max="100" style="max-width: 200px;">
+                    <div class="form-hint">Это значение принимается за 100%. Процент выполнения рассчитывается исходя из количества правильно заполненных пропусков.</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                <button class="btn-outline" onclick="closeTextWorkModal()">Отмена</button>
+                <button class="btn-primary" onclick="saveTextWorkTask()">
+                    <i class="fas fa-save"></i> Сохранить задание
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Выбор типа задания -->
+    <div id="taskTypeModal" class="modal">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Выберите тип задания</h3>
+                <span class="close-modal" onclick="closeTaskTypeModal()">&times;</span>
+            </div>
+            <div class="task-type-selector">
+                <div class="task-type-card" onclick="selectTaskType('multiple-choice')">
+                    <div class="task-type-icon"><i class="fas fa-check-square"></i></div>
+                    <div class="task-type-title">Выбрать варианты ответа</div>
+                    <div class="task-type-desc">Создание заданий с выбором ответов и пропусками</div>
+                </div>
+                <div class="task-type-card" onclick="selectTaskType('matching')">
+                    <div class="task-type-icon"><i class="fas fa-link"></i></div>
+                    <div class="task-type-title">Установить соответствие</div>
+                    <div class="task-type-desc">Задания на соответствие и распределение по столбцам</div>
+                </div>
+                <div class="task-type-card" onclick="selectTaskType('write-word')">
+                    <div class="task-type-icon"><i class="fas fa-pencil-alt"></i></div>
+                    <div class="task-type-title">Написать слово</div>
+                    <div class="task-type-desc">Ввод ответа словом с проверкой</div>
+                </div>
+                <div class="task-type-card" onclick="selectTaskType('text-work')">
+                    <div class="task-type-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="task-type-title">Работа с текстом</div>
+                    <div class="task-type-desc">Задания на анализ текста, поиск ошибок</div>
+                </div>
+                <div class="task-type-card" id="enhancedMatchCard" onclick="selectTaskType('enhanced-matching')">
+                    <div class="task-type-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div class="task-type-title">Анализ + Соответствие</div>
+                    <div class="task-type-desc">Подчеркивание членов предложения + соединение линиями</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: Расширенное соответствие (Enhanced Matching) -->
+    <div id="enhancedMatchingModal" class="modal">
+        <!-- Содержимое рендерится динамически через JS -->
+    </div>
+
+    <!-- Модальное окно: Добавление ученика -->
+    <div id="addStudentModal" class="modal">
+        <!-- Содержимое рендерится динамически через JS -->
+    </div>
+
+    <!-- ============================================
+    ПОДКЛЮЧЕНИЕ APP.JS (ГЛАВНЫЙ ФАЙЛ)
+    ============================================ -->
+    <script src="js/app.js"></script>
 </body>
 </html>
