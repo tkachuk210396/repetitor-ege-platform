@@ -40,22 +40,34 @@ const NAV_CONFIG = {
  */
 const SECTION_RENDERERS = {
     // Админские разделы
-    'admin-dashboard': renderAdminDashboard,
-    'admin-lessons': renderAdminLessons,
-    'admin-tasks': renderAdminTasks,
-    'admin-review': renderAdminReview,
-    'admin-students': renderAdminStudents,
-    'admin-reports': renderAdminReports,
-    'admin-settings': renderAdminSettings,
+    'admin-dashboard': window.renderAdminDashboard || function() { console.warn('renderAdminDashboard not defined'); },
+    'admin-lessons': window.renderAdminLessons || function() { console.warn('renderAdminLessons not defined'); },
+    'admin-tasks': window.renderAdminTasks || function() { console.warn('renderAdminTasks not defined'); },
+    'admin-review': window.renderAdminReview || function() { console.warn('renderAdminReview not defined'); },
+    'admin-students': window.renderAdminStudents || function() { console.warn('renderAdminStudents not defined'); },
+    'admin-reports': window.renderAdminReports || function() { console.warn('renderAdminReports not defined'); },
+    'admin-settings': window.renderAdminSettings || function() { console.warn('renderAdminSettings not defined'); },
     
     // Студенческие разделы
-    'student-dashboard': renderStudentDashboard,
-    'student-lessons': renderStudentLessons,
-    'student-tasks': renderStudentTasks,
+    'student-dashboard': window.renderStudentDashboard || function() { console.warn('renderStudentDashboard not defined'); },
+    'student-lessons': window.renderStudentLessons || function() { console.warn('renderStudentLessons not defined'); },
+    'student-tasks': window.renderStudentTasks || function() { console.warn('renderStudentTasks not defined'); },
     'student-task-execution': renderStudentTaskExecution,
-    'student-progress': renderStudentProgress,
-    'student-settings': renderStudentSettings
+    'student-progress': window.renderStudentProgress || function() { console.warn('renderStudentProgress not defined'); },
+    'student-settings': window.renderStudentSettings || function() { console.warn('renderStudentSettings not defined'); }
 };
+
+/**
+ * Специальный рендерер для выполнения заданий учеником
+ */
+function renderStudentTaskExecution(container) {
+    container.innerHTML = `
+        <button class="btn-back" onclick="backToTasks()" style="margin-bottom: 16px;">
+            <i class="fas fa-arrow-left"></i> Назад к заданиям
+        </button>
+        <div id="taskExecutionContainer"></div>
+    `;
+}
 
 /**
  * Построение навигационного меню
@@ -121,11 +133,11 @@ function renderSection(sectionId) {
                     <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;"></i>
                     <h3>Ошибка загрузки раздела</h3>
                     <p style="color: #64748b;">Пожалуйста, обновите страницу или обратитесь к администратору</p>
+                    <p style="color: #94a3b8; font-size: 12px; margin-top: 8px;">${e.message}</p>
                 </div>
             `;
         }
     } else {
-        // Если рендерер не найден, показываем заглушку
         container.innerHTML = `
             <div class="card" style="padding: 40px; text-align: center;">
                 <i class="fas fa-code" style="font-size: 48px; color: #4f46e5; margin-bottom: 16px;"></i>
@@ -137,73 +149,11 @@ function renderSection(sectionId) {
 }
 
 /**
- * Специальный рендерер для выполнения заданий учеником
- * Этот раздел отображается динамически при открытии задания
- */
-function renderStudentTaskExecution(container) {
-    container.innerHTML = `
-        <button class="btn-back" onclick="backToTasks()" style="margin-bottom: 16px;">
-            <i class="fas fa-arrow-left"></i> Назад к заданиям
-        </button>
-        <div id="taskExecutionContainer"></div>
-    `;
-}
-
-/**
  * Возврат к списку заданий
  */
 function backToTasks() {
     navigateTo('student-tasks');
 }
-
-/**
- * Получение всех доступных разделов для роли
- * @param {string} role - Роль пользователя
- * @returns {Array} Массив разделов
- */
-function getNavItems(role) {
-    return NAV_CONFIG[role] || [];
-}
-
-/**
- * Проверка, существует ли раздел
- * @param {string} sectionId - ID раздела
- * @returns {boolean} Существует ли раздел
- */
-function sectionExists(sectionId) {
-    const allItems = [...NAV_CONFIG.admin, ...NAV_CONFIG.student];
-    return allItems.some(item => item.id === sectionId);
-}
-
-/**
- * Получение метаданных раздела
- * @param {string} sectionId - ID раздела
- * @returns {Object|null} Объект с метаданными или null
- */
-function getSectionMeta(sectionId) {
-    const allItems = [...NAV_CONFIG.admin, ...NAV_CONFIG.student];
-    return allItems.find(item => item.id === sectionId) || null;
-}
-
-/**
- * ============================================
- * ЭКСПОРТ ДЛЯ ГЛОБАЛЬНОГО ИСПОЛЬЗОВАНИЯ
- * ============================================
- */
-
-// Экспортируем конфигурацию
-window.NAV_CONFIG = NAV_CONFIG;
-
-// Экспортируем основные функции
-window.buildNavigation = buildNavigation;
-window.navigateTo = navigateTo;
-window.renderSection = renderSection;
-window.backToTasks = backToTasks;
-
-// Экспортируем вспомогательные функции
-window.getNavItems = getNavItems;
-window.sectionExists = sectionExists;
-window.getSectionMeta = getSectionMeta;
 
 // Сообщаем о загрузке модуля
 console.log('🧭 Модуль router.js загружен');
