@@ -8,13 +8,11 @@
  * - Создание тестовых занятий
  * - Создание тестовых заданий
  * - Создание тестовых назначений
- * - Проверку наличия данных и их инициализацию
  * ============================================
  */
 
 /**
  * Конфигурация ключей для localStorage
- * Используется для согласованности с storage.js
  */
 const DATA_CONFIG = {
     USERS_KEY: 'ege_tutor_users_v1',
@@ -36,7 +34,6 @@ const LessonStatus = {
 
 /**
  * Инициализация всех тестовых данных
- * Вызывается при первом запуске приложения
  */
 function initAllData() {
     initUsers();
@@ -91,17 +88,14 @@ function initLessons() {
         if (students.length > 0 && admin) {
             const now = new Date();
             
-            // Завтра в 17:00
             const tomorrow = new Date(now);
             tomorrow.setDate(tomorrow.getDate() + 1);
             tomorrow.setHours(17, 0, 0, 0);
             
-            // Через 3 дня в 15:30
             const nextWeek = new Date(now);
             nextWeek.setDate(nextWeek.getDate() + 3);
             nextWeek.setHours(15, 30, 0, 0);
             
-            // Через 7 дней в 18:00
             const weekLater = new Date(now);
             weekLater.setDate(weekLater.getDate() + 7);
             weekLater.setHours(18, 0, 0, 0);
@@ -162,7 +156,6 @@ function initLessons() {
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString()
                 },
-                // Завершённое занятие для статистики
                 {
                     id: 1004,
                     title: 'Вводное занятие',
@@ -182,8 +175,6 @@ function initLessons() {
             ];
             localStorage.setItem(DATA_CONFIG.LESSONS_KEY, JSON.stringify(lessons));
             console.log('  📅 Созданы тестовые занятия:', lessons.length);
-        } else {
-            console.warn('⚠️ Не удалось создать занятия: недостаточно пользователей');
         }
     }
 }
@@ -194,7 +185,6 @@ function initLessons() {
 function initTasks() {
     if (!localStorage.getItem(DATA_CONFIG.TASKS_KEY)) {
         const tasks = [
-            // ===== ЗАДАНИЕ 1: Множественный выбор (авто) =====
             {
                 id: 1,
                 type: 'multiple-choice',
@@ -226,8 +216,6 @@ function initTasks() {
                 ],
                 createdAt: new Date().toLocaleDateString()
             },
-            
-            // ===== ЗАДАНИЕ 2: Множественный выбор (ручная) =====
             {
                 id: 2,
                 type: 'multiple-choice',
@@ -256,8 +244,6 @@ function initTasks() {
                 ],
                 createdAt: new Date().toLocaleDateString()
             },
-            
-            // ===== ЗАДАНИЕ 3: Написать слово (авто) =====
             {
                 id: 3,
                 type: 'write-word',
@@ -271,8 +257,6 @@ function initTasks() {
                 correctAnswers: ['невежественный', 'невежа'],
                 createdAt: new Date().toLocaleDateString()
             },
-            
-            // ===== ЗАДАНИЕ 4: Соответствие (pairs) =====
             {
                 id: 4,
                 type: 'matching',
@@ -299,8 +283,6 @@ function initTasks() {
                 ],
                 createdAt: new Date().toLocaleDateString()
             },
-            
-            // ===== ЗАДАНИЕ 5: Распределение (distribution) =====
             {
                 id: 5,
                 type: 'matching',
@@ -323,8 +305,6 @@ function initTasks() {
                 ],
                 createdAt: new Date().toLocaleDateString()
             },
-            
-            // ===== ЗАДАНИЕ 6: Работа с текстом (авто) =====
             {
                 id: 6,
                 type: 'text-work',
@@ -339,8 +319,6 @@ function initTasks() {
                 gapCount: 3,
                 createdAt: new Date().toLocaleDateString()
             },
-            
-            // ===== ЗАДАНИЕ 7: Сочинение (ручная) =====
             {
                 id: 7,
                 type: 'essay',
@@ -361,7 +339,7 @@ function initTasks() {
 }
 
 /**
- * Инициализация тестовых назначений (связей ученик-задание)
+ * Инициализация тестовых назначений
  */
 function initAssignments() {
     if (!localStorage.getItem(DATA_CONFIG.ASSIGNMENTS_KEY)) {
@@ -370,9 +348,9 @@ function initAssignments() {
         const students = users.filter(u => u.role === 'student');
         const assignments = [];
         
-        // Создаём назначения для каждого задания
         tasks.forEach(task => {
-            if (task.type === 'multiple-choice') {
+            if (task.type === 'multiple-choice' || task.type === 'write-word' || 
+                task.type === 'text-work' || task.type === 'essay') {
                 if (task.availability === 'all') {
                     students.forEach(student => {
                         assignments.push({
@@ -382,6 +360,7 @@ function initAssignments() {
                             status: 'new',
                             subtaskAnswers: {},
                             answers: {},
+                            studentAnswer: '',
                             comments: [],
                             reviewComments: []
                         });
@@ -395,57 +374,6 @@ function initAssignments() {
                             status: 'new',
                             subtaskAnswers: {},
                             answers: {},
-                            comments: [],
-                            reviewComments: []
-                        });
-                    });
-                }
-            } else if (task.type === 'write-word') {
-                if (task.availability === 'all') {
-                    students.forEach(student => {
-                        assignments.push({
-                            id: Date.now() + Math.random(),
-                            studentId: student.id,
-                            taskId: task.id,
-                            status: 'new',
-                            studentAnswer: '',
-                            comments: [],
-                            reviewComments: []
-                        });
-                    });
-                } else if (task.availability === 'selective' && task.availableFor) {
-                    task.availableFor.forEach(studentId => {
-                        assignments.push({
-                            id: Date.now() + Math.random(),
-                            studentId: studentId,
-                            taskId: task.id,
-                            status: 'new',
-                            studentAnswer: '',
-                            comments: [],
-                            reviewComments: []
-                        });
-                    });
-                }
-            } else if (task.type === 'text-work' || task.type === 'essay') {
-                if (task.availability === 'all') {
-                    students.forEach(student => {
-                        assignments.push({
-                            id: Date.now() + Math.random(),
-                            studentId: student.id,
-                            taskId: task.id,
-                            status: 'new',
-                            studentAnswer: '',
-                            comments: [],
-                            reviewComments: []
-                        });
-                    });
-                } else if (task.availability === 'selective' && task.availableFor) {
-                    task.availableFor.forEach(studentId => {
-                        assignments.push({
-                            id: Date.now() + Math.random(),
-                            studentId: studentId,
-                            taskId: task.id,
-                            status: 'new',
                             studentAnswer: '',
                             comments: [],
                             reviewComments: []
@@ -453,7 +381,6 @@ function initAssignments() {
                     });
                 }
             } else {
-                // Для всех остальных типов (matching)
                 students.forEach(student => {
                     assignments.push({
                         id: Date.now() + Math.random(),
@@ -468,8 +395,7 @@ function initAssignments() {
             }
         });
         
-        // Добавляем несколько выполненных заданий для демонстрации
-        // Задание 2 (ручная проверка) - отправлено на проверку
+        // Добавляем выполненные задания
         const task2 = tasks.find(t => t.id === 2);
         if (task2) {
             const u2 = students.find(s => s.id === 'u2');
@@ -514,7 +440,6 @@ function initAssignments() {
             }
         }
         
-        // Задание 4 (соответствие) - авто-проверка
         const task4 = tasks.find(t => t.id === 4);
         if (task4) {
             const u2 = students.find(s => s.id === 'u2');
@@ -537,7 +462,6 @@ function initAssignments() {
             }
         }
         
-        // Задание 1 (множественный выбор) - выполнено с прогрессом
         const task1 = tasks.find(t => t.id === 1);
         if (task1) {
             const u2 = students.find(s => s.id === 'u2');
@@ -566,11 +490,10 @@ function initAssignments() {
 }
 
 /**
- * Сброс всех данных (для отладки)
- * Внимание! Удаляет все данные из localStorage
+ * Сброс всех данных
  */
 function resetAllData() {
-    const confirmReset = confirm('⚠️ Вы уверены, что хотите удалить все данные? Это действие нельзя отменить.');
+    const confirmReset = confirm('⚠️ Вы уверены, что хотите удалить все данные?');
     if (confirmReset) {
         localStorage.removeItem(DATA_CONFIG.USERS_KEY);
         localStorage.removeItem(DATA_CONFIG.LESSONS_KEY);
@@ -585,43 +508,7 @@ function resetAllData() {
     }
 }
 
-/**
- * Вывод информации о текущем состоянии данных
- */
-function showDataInfo() {
-    const users = JSON.parse(localStorage.getItem(DATA_CONFIG.USERS_KEY) || '[]');
-    const lessons = JSON.parse(localStorage.getItem(DATA_CONFIG.LESSONS_KEY) || '[]');
-    const tasks = JSON.parse(localStorage.getItem(DATA_CONFIG.TASKS_KEY) || '[]');
-    const assignments = JSON.parse(localStorage.getItem(DATA_CONFIG.ASSIGNMENTS_KEY) || '[]');
-    
-    console.group('📊 Состояние данных');
-    console.log('  👥 Пользователи:', users.length);
-    console.log('  📅 Занятия:', lessons.length);
-    console.log('  📚 Задания:', tasks.length);
-    console.log('  📝 Назначения:', assignments.length);
-    console.groupEnd();
-    
-    return { users, lessons, tasks, assignments };
-}
-
-// ============================================
-// ЭКСПОРТ ДЛЯ ГЛОБАЛЬНОГО ИСПОЛЬЗОВАНИЯ
-// ============================================
-
-// Экспортируем конфигурацию
-window.DATA_CONFIG = DATA_CONFIG;
-window.LessonStatus = LessonStatus;
-
-// Экспортируем функции инициализации
-window.initAllData = initAllData;
-window.initUsers = initUsers;
-window.initLessons = initLessons;
-window.initTasks = initTasks;
-window.initAssignments = initAssignments;
-window.resetAllData = resetAllData;
-window.showDataInfo = showDataInfo;
-
-// Автоматическая инициализация при загрузке модуля
+// Автоматическая инициализация
 initAllData();
 
 console.log('📦 Модуль initData.js загружен');
