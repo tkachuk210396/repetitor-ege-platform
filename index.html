@@ -17,12 +17,11 @@
     <link rel="stylesheet" href="css/style.css">
     
     <!-- ============================================
-    ПОДКЛЮЧЕНИЕ ДАННЫХ И ЯДРА
+    ПОДКЛЮЧЕНИЕ ДАННЫХ И ЯДРА (ПЕРВЫЙ ЭТАП)
     ============================================ -->
     <script src="data/initData.js"></script>
     <script src="js/core/storage.js"></script>
     <script src="js/core/auth.js"></script>
-    <script src="js/core/router.js"></script>
     
     <!-- ============================================
     ПОДКЛЮЧЕНИЕ SHARED МОДУЛЕЙ
@@ -32,8 +31,10 @@
     <script src="js/shared/modalManager.js"></script>
     
     <!-- ============================================
-    ПОДКЛЮЧЕНИЕ МОДУЛЕЙ АДМИНИСТРАТОРА
+    ПОДКЛЮЧЕНИЕ ВСЕХ МОДУЛЕЙ (ДО РОУТЕРА!)
     ============================================ -->
+    
+    <!-- МОДУЛИ АДМИНИСТРАТОРА -->
     <script src="js/modules/admin/AdminDashboard.js"></script>
     <script src="js/modules/admin/AdminLessons.js"></script>
     <script src="js/modules/admin/AdminTasks.js"></script>
@@ -41,10 +42,9 @@
     <script src="js/modules/admin/AdminStudents.js"></script>
     <script src="js/modules/admin/AdminReports.js"></script>
     <script src="js/modules/admin/AdminSettings.js"></script>
+    <script src="js/modules/admin/EnhancedMatching.js"></script>
     
-    <!-- ============================================
-    ПОДКЛЮЧЕНИЕ МОДУЛЕЙ УЧЕНИКА
-    ============================================ -->
+    <!-- МОДУЛИ УЧЕНИКА -->
     <script src="js/modules/student/StudentDashboard.js"></script>
     <script src="js/modules/student/StudentLessons.js"></script>
     <script src="js/modules/student/StudentTasks.js"></script>
@@ -52,9 +52,14 @@
     <script src="js/modules/student/StudentSettings.js"></script>
     
     <!-- ============================================
-    ПОДКЛЮЧЕНИЕ РАСШИРЕННЫХ МОДУЛЕЙ ЗАДАНИЙ
+    ПОДКЛЮЧЕНИЕ РОУТЕРА (ПОСЛЕ ВСЕХ МОДУЛЕЙ!)
     ============================================ -->
-    <script src="js/modules/admin/EnhancedMatching.js"></script>
+    <script src="js/core/router.js"></script>
+    
+    <!-- ============================================
+    ПОДКЛЮЧЕНИЕ APP.JS (ГЛАВНЫЙ ФАЙЛ)
+    ============================================ -->
+    <script src="js/app.js"></script>
 </head>
 <body>
     <!-- ============================================
