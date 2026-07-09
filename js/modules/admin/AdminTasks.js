@@ -1,9 +1,20 @@
-// Управление заданиями
 export default class AdminTasks {
     render() {
-        return `<div>
-            <h2>Все задания</h2>
-            <button>Создать задание</button>
-        </div>`;
+        return `
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h1 style="font-size: 24px; font-weight: 700;">📝 Задания</h1>
+                    <button class="btn btn-primary" onclick="alert('Создание задания будет доступно позже')">
+                        + Создать задание
+                    </button>
+                </div>
+                
+                <div style="background: #f1f5f9; border-radius: 16px; padding: 40px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
+                    <h3 style="font-weight: 600; margin-bottom: 8px;">Здесь будут ваши задания</h3>
+                    <p style="color: #64748b;">Добавьте первое задание, нажав кнопку выше.</p>
+                </div>
+            </div>
+        `;
     }
 }
