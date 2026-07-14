@@ -30,6 +30,7 @@ const NAV_CONFIG = {
         { id: 'student-tasks', icon: 'fa-tasks', label: 'Мои задания' },
         { id: 'student-task-execution', icon: 'fa-play', label: 'Выполнение' },
         { id: 'student-progress', icon: 'fa-chart-line', label: 'Мой прогресс' },
+        { id: 'student-fast-train', icon: 'fa-bolt', label: 'Быстрая тренировка' },
         { id: 'student-settings', icon: 'fa-cog', label: 'Настройки' }
     ]
 };
@@ -54,6 +55,7 @@ const SECTION_RENDERERS = {
     'student-tasks': window.renderStudentTasks || function() { console.warn('renderStudentTasks not defined'); },
     'student-task-execution': renderStudentTaskExecution,
     'student-progress': window.renderStudentProgress || function() { console.warn('renderStudentProgress not defined'); },
+    'student-fast-train': window.renderFastTrain || function() { console.warn('renderFastTrain not defined'); },
     'student-settings': window.renderStudentSettings || function() { console.warn('renderStudentSettings not defined'); }
 };
 
