@@ -4069,3 +4069,425 @@ tr:last-child td {
         gap: 20px;
     }
 }
+
+/* ============================================
+   СТИЛИ ДЛЯ БЫСТРОЙ ТРЕНИРОВКИ (FastTrain.js)
+   ============================================ */
+
+/* Блок "Запустить спринт" */
+.sprint-block {
+    background: white;
+    border-radius: 24px;
+    padding: 28px 32px 32px;
+    border: 1px solid #eef2f6;
+    text-align: center;
+    margin-bottom: 28px;
+}
+.sprint-block .sprint-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #4f46e5;
+    margin-bottom: 6px;
+}
+.sprint-block .sprint-subtitle {
+    font-size: 14px;
+    color: #94a3b8;
+    margin-bottom: 20px;
+}
+.sprint-block .sprint-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.sprint-block .sprint-buttons .btn-sprint {
+    padding: 10px 32px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 15px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.15s;
+    min-width: 120px;
+}
+.sprint-block .sprint-buttons .btn-sprint:hover {
+    background: #4338ca;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(79,70,229,0.3);
+}
+.sprint-block .sprint-buttons .btn-sprint:active {
+    transform: translateY(0);
+}
+
+/* Индикатор спринта */
+.sprint-indicator {
+    background: #fef9c3;
+    padding: 8px 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border-left: 4px solid #eab308;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.sprint-indicator .sprint-progress {
+    font-weight: 600;
+    color: #854d0e;
+}
+
+/* Список упражнений */
+.exercises-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.exercises-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+}
+.exercises-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Элемент упражнения */
+.exercise-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 18px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #eef2f6;
+    transition: 0.15s;
+    cursor: pointer;
+}
+.exercise-item:hover {
+    border-color: #cbd5e1;
+    background: #fafbfc;
+}
+.exercise-item .ex-number {
+    font-weight: 700;
+    font-size: 14px;
+    color: #4f46e5;
+    min-width: 70px;
+}
+.exercise-item .ex-name {
+    flex: 1;
+    font-size: 14px;
+}
+.exercise-item .ex-status {
+    margin-right: 8px;
+}
+.exercise-item .ex-date {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-right: 12px;
+}
+.exercise-item .btn-start {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.15s;
+}
+.exercise-item .btn-start:hover {
+    background: #4338ca;
+    transform: scale(1.04);
+}
+
+/* Бейджи статусов упражнений */
+.badge-in-progress {
+    background: #dbeafe;
+    color: #1e40af;
+}
+.badge-done {
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* Страница выполнения */
+.execution-container {
+    background: white;
+    border-radius: 24px;
+    padding: 28px 32px;
+    border: 1px solid #eef2f6;
+}
+.execution-container .exec-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+.execution-container .exec-text {
+    background: #f8fafc;
+    padding: 16px 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    line-height: 1.8;
+    border: 1px solid #eef2f6;
+}
+.execution-container .task-block {
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: #f8fafc;
+    border-radius: 16px;
+    border-left: 4px solid #4f46e5;
+}
+.execution-container .task-block .task-label {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #334155;
+}
+.execution-container .task-block .task-text {
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+.execution-container .task-block textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 80px;
+}
+.execution-container .task-block textarea:focus {
+    border-color: #4f46e5;
+    outline: none;
+}
+.execution-container .task-block .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.execution-container .task-block .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    cursor: pointer;
+    transition: 0.15s;
+}
+.execution-container .task-block .option:hover {
+    border-color: #4f46e5;
+}
+.execution-container .task-block .option.selected {
+    border-color: #4f46e5;
+    background: #e9e7f7;
+}
+.execution-container .task-block .option.correct {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+.execution-container .task-block .option.incorrect {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+.execution-container .task-block .option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #4f46e5;
+    cursor: pointer;
+}
+
+/* Matching (соответствие) */
+.matching-container {
+    display: flex;
+    gap: 40px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+}
+.matching-col {
+    flex: 1;
+    min-width: 200px;
+}
+.matching-col .matching-item {
+    padding: 10px 16px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.matching-col .matching-item .label {
+    font-weight: 600;
+    color: #4f46e5;
+    min-width: 30px;
+}
+.matching-selectors {
+    margin: 16px 0;
+}
+.matching-selectors .selector-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 6px;
+}
+.matching-selectors .selector-row .left-ref {
+    font-weight: 600;
+    color: #4f46e5;
+    min-width: 40px;
+}
+.matching-selectors .selector-row .left-text {
+    flex: 1;
+}
+.matching-selectors .selector-row select {
+    padding: 6px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    min-width: 80px;
+}
+.matching-selectors .selector-row select:focus {
+    border-color: #4f46e5;
+    outline: none;
+}
+
+/* Результаты */
+.result-box {
+    margin-top: 20px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+}
+.result-box .result-score {
+    font-size: 24px;
+    font-weight: 700;
+}
+.result-box .result-details {
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+/* Кнопки спринта */
+.btn-sprint-next {
+    background: #eab308;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+.btn-sprint-next:hover {
+    background: #d97706;
+    transform: scale(1.03);
+}
+.btn-sprint-check {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+.btn-sprint-check:hover {
+    background: #4338ca;
+    transform: scale(1.03);
+}
+
+/* Адаптивность для быстрой тренировки */
+@media (max-width: 1024px) {
+    .exercise-item {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .exercise-item .ex-number {
+        min-width: 50px;
+    }
+    .matching-container {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sprint-block {
+        padding: 20px;
+    }
+    .sprint-block .sprint-title {
+        font-size: 22px;
+    }
+    .sprint-block .sprint-buttons .btn-sprint {
+        padding: 8px 20px;
+        font-size: 13px;
+        min-width: 80px;
+    }
+    .execution-container {
+        padding: 16px;
+    }
+    .execution-container .exec-title {
+        font-size: 20px;
+    }
+    .exercise-item {
+        padding: 10px 14px;
+    }
+    .exercise-item .ex-date {
+        font-size: 11px;
+        margin-right: 8px;
+    }
+    .exercise-item .btn-start {
+        font-size: 11px;
+        padding: 3px 12px;
+    }
+    .matching-selectors .selector-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sprint-block .sprint-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .sprint-block .sprint-buttons .btn-sprint {
+        width: 100%;
+        max-width: 200px;
+    }
+    .sprint-indicator {
+        flex-direction: column;
+        text-align: center;
+    }
+    .execution-container .task-block {
+        padding: 12px 14px;
+    }
+    .execution-container .task-block textarea {
+        min-height: 60px;
+    }
+    .exercise-item .ex-number {
+        font-size: 12px;
+        min-width: 40px;
+    }
+    .exercise-item .ex-name {
+        font-size: 12px;
+    }
+}
